@@ -7,12 +7,15 @@ PORT = 7500
 BUFSIZE = 4096
 
 clist = []
-
+cdict = {}
 
 def client_handler(client, addr):
     while True:
         try:
             data = client.recv(BUFSIZE)
+            check = data.decode('utf-8').split('|')
+            if check[0] == 'NAME':
+                cdict[str(addr)] = check[1]
         except:
             clist.remove(client)
             break
@@ -22,7 +25,11 @@ def client_handler(client, addr):
             print('quit: ', client)
             break
 
-        msg = str(addr) + '>>>  ' + data.decode('utf-8')  # message for send for another user
+        try:
+            username = cdict[str(addr)]
+            msg = username + '>>>  ' + data.decode('utf-8')  # message for send for another user
+        except:
+            msg = str(addr) + '>>>  ' + data.decode('utf-8')  # message for send for another user
         print('user: ', msg)
         print('--------------')
         for c in clist:
